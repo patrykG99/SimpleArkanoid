@@ -5,12 +5,12 @@ import java.awt.event.KeyEvent;
 
 
 public class Bat extends Element {
-    private int xx;
+    private float xx;
     public Bat(){
         image = new ImageIcon("src/images/bat.png").getImage();
         getDimensions();
-        x = 400;
-        y = 550;
+        x = 400f;
+        y = 550f;
     }
 
     void move(){

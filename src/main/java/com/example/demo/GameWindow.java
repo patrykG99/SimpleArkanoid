@@ -95,149 +95,110 @@ public class GameWindow extends JPanel {
     }
 
     private void drawObjects(Graphics2D g2d) {
-        g2d.drawImage(bat.getImage(), bat.getX(), bat.getY(), bat.getWidth(), bat.getHeight(), this);
-        g2d.drawImage(ball.getImage(), ball.getX(), ball.getY(), ball.getWidth(), ball.getHeight(), this);
+        g2d.drawImage(bat.getImage(), (int) bat.getX(), (int) bat.getY(), bat.getWidth(), bat.getHeight(), this);
+        g2d.drawImage(ball.getImage(), (int)ball.getX(), (int)ball.getY(), ball.getWidth(), ball.getHeight(), this);
         if (menu.getSelectedLevel() != 0){
             for (int i = 0; i < bricksTC; ) {
                 if (bricks[i].isDestr()) {
                     i++;
                 } else {
-                    g2d.drawImage(bricks[i].getImage(), bricks[i].getX(), bricks[i].getY(), bricks[i].getWidth(), bricks[i].getHeight(), this);
+                    g2d.drawImage(bricks[i].getImage(), (int) bricks[i].getX(), (int) bricks[i].getY(), bricks[i].getWidth(), bricks[i].getHeight(), this);
                     i++;
                 }
             }
         }
     }
 
-    private void collisions(){
-        if(ball.getY()>=600-ball.getHeight()){
-            inGame = false;
-            bricksAmount = 0;
-            finishTime = LocalDateTime.now();
-            points -= Duration.between(startTime,finishTime).toSeconds();
-            if(points < 0)
-                points = 0;
-
-        }
-        if(bricksAmount == 0){
-            inGame = false;
-            bricksAmount = 0;
-            finishTime = LocalDateTime.now();
-            points += 1000;
-            points -= Duration.between(startTime,finishTime).toSeconds();
-            if(points < 0)
-                points = 0;
-
-
-        }
-
-        if(ball.getY() -1 ==bat.getY()-ball.getHeight()){
-            if(ball.getX()>=bat.getX()&&ball.getX()<=bat.getX()+(bat.getWidth()/2)){
-                ball.setYd(-1);
-                ball.setXd(-1);
-            }
-            else if(ball.getX()>bat.getX()+(bat.getWidth()/2) && ball.getX()<=bat.getX()+bat.getWidth()) {
-                ball.setYd(-1);
-                ball.setXd(1);
-            }
-        }
-        else if(ball.getY() + ball.getHeight() >= bat.getY() && ball.getY() <= bat.getY() + bat.getHeight()){
-
-            if(ball.getX() + ball.getWidth() - 1 == bat.getX()){
-                ball.setXd(ball.getXd()*(-1));
-            }
-            else if(ball.getX()== bat.getX() + bat.getWidth()){
-                ball.setXd(ball.getXd()*(-1));
-            }
-        }
-
-        //Brick Collisions
-        int ballPosY = ball.getY();
-        int x = 0;
-        for(int i=0; i<bricksTC;i++) {
-            //From bottom
-            if (ballPosY == bricks[x].getY() + bricks[x].height) {
-                if (ball.getX() + ball.getWidth() >= bricks[x].getX() && ball.getX() <= bricks[x].getX() + bricks[x].getWidth() && !bricks[x].isDestr()) {
-                    ball.setYd(1);
-                    if(bricks[i] instanceof ToughBrick){
-                        if(((ToughBrick)bricks[i]).getHp() > 1){
-                            ((ToughBrick)bricks[i]).setHp(1);
-                        }
-                        else{
-                            bricks[i].setDestr(true);
-                            bricksAmount--;
-                            points += 200;
-                        }
-                    }
-                    else {
-                        bricks[x].setDestr(true);
-                        bricksAmount--;
-                        points += 100;
-                    }
-                }
-            }
-
-            //From top
-            else if (ballPosY + ball.getHeight() +1 == bricks[x].getY()) {
-                if (ball.getX() + ball.getWidth() >= bricks[x].getX() && ball.getX() <= bricks[x].getX() + bricks[x].getWidth() && !bricks[x].isDestr()) {
-                    ball.setYd(-1);
-                    if(bricks[i] instanceof ToughBrick){
-                        if(((ToughBrick)bricks[i]).getHp() > 1){
-                            ((ToughBrick)bricks[i]).setHp(1);
-                        }
-                        else{
-                            bricks[i].setDestr(true);
-                            bricksAmount--;
-                            points += 100;
-                        }
-                    }
-                    else {
-                        bricks[x].setDestr(true);
-                        bricksAmount--;
-                        points += 100;
-                    }
-                }
-            }
-            //Sides
-            else if (ballPosY + ball.getHeight() >= bricks[x].getY() && ballPosY <= bricks[x].getY() + bricks[x].getHeight()) {
-                if (ball.getX() + ball.getWidth()+1 == bricks[x].getX() && !bricks[x].isDestr()) {
-
-                    ball.setXd(ball.getXd() * (-1));
-                    if(bricks[i] instanceof ToughBrick){
-                        if(((ToughBrick)bricks[i]).getHp() > 1){
-                            ((ToughBrick)bricks[i]).setHp(((ToughBrick) bricks[i]).getHp()-1);
-
-                        }
-                        else{
-                            bricks[i].setDestr(true);
-                            bricksAmount--;
-                        }
-                    }
-                    else {
-                        bricks[x].setDestr(true);
-                        bricksAmount--;
-                    }
-
-                } else if (ball.getX() == bricks[x].getX() + bricks[x].getWidth() && !bricks[x].isDestr()) {
-                    ball.setXd(ball.getXd() * (-1));
-                    if(bricks[i] instanceof ToughBrick){
-                        if(((ToughBrick)bricks[i]).getHp() > 1){
-                            ((ToughBrick)bricks[i]).setHp(1);
-                        }
-                        else{
-                            bricks[i].setDestr(true);
-                            bricksAmount--;
-                        }
-                    }
-                    else {
-                        bricks[x].setDestr(true);
-                        bricksAmount--;
-                    }
-                }
-            }
-            x++;
+    private void checkGameState() {
+        if (ball.getY() >= 600 - ball.getHeight()) {
+            endGame(false);
+        } else if (bricksAmount == 0) {
+            endGame(true);
         }
     }
+    private void checkBallBrickCollision() {
+        float ballPosY = ball.getY();
+
+        for (int i = 0; i < bricks.length; i++) {
+            Brick brick = bricks[i];
+            // Add a check to ensure brick is not null
+            if (brick != null && !brick.isDestr() && ballCollidesWithBrick(brick)) {
+                handleBrickCollision(brick);
+            }
+        }
+    }
+    private void collisions() {
+        checkGameState();
+        checkBallBatCollision();
+        checkBallBrickCollision();
+    }
+    private void checkBallBatCollision() {
+        if (ball.getY() + ball.getHeight() >= bat.getY() && ball.getY() <= bat.getY() + bat.getHeight()) {
+            if (ball.getX() + ball.getWidth() > bat.getX() && ball.getX() < bat.getX() + bat.getWidth()) {
+                // Reverse the Y direction
+                ball.setYd(-2f); // You can adjust this value for desired vertical speed
+
+                // Calculate the hit position on the bat
+                double hitPosition = (ball.getX() + (double) ball.getWidth() / 2) - (bat.getX() + (double) bat.getWidth() / 2);
+                double relativeHitPosition = 4 * hitPosition / (double) bat.getWidth(); // Adjusted for more range
+
+                // Set new direction and speed
+                ball.setXd((float) relativeHitPosition); // Here, speed and direction are combined
+            }
+        }
+    }
+    private void handleBrickCollision(Brick brick) {
+        if (brick == null) {
+            return;
+        }
+        if (ball.getY() + ball.getHeight() - 1 <= brick.getY() ||
+                ball.getY() >= brick.getY() + brick.getHeight()) {
+            ball.setYd(ball.getYd() * -1);
+        } else {
+            ball.setXd(ball.getXd() * -1);
+        }
+
+        // Handle ToughBrick and regular brick differently
+        if (brick instanceof ToughBrick) {
+            ToughBrick toughBrick = (ToughBrick) brick;
+            if (toughBrick.getHp() > 1) {
+                toughBrick.setHp(toughBrick.getHp() - 1);
+            } else {
+                brick.setDestr(true);
+                bricksAmount--;
+                points += 200;
+            }
+        } else {
+            brick.setDestr(true);
+            bricksAmount--;
+            points += 100;
+        }
+    }
+    private boolean ballCollidesWithBrick(Brick brick) {
+        if (brick == null || brick.isDestr()) {
+            return false;
+        }
+        return ball.getY() + ball.getHeight() >= brick.getY() &&
+                ball.getY() <= brick.getY() + brick.getHeight() &&
+                ball.getX() + ball.getWidth() >= brick.getX() &&
+                ball.getX() <= brick.getX() + brick.getWidth();
+    }
+
+    private void endGame(boolean won) {
+        inGame = false;
+        finishTime = LocalDateTime.now();
+        long duration = Duration.between(startTime, finishTime).toSeconds();
+
+        if (won) {
+            points += 1000 - duration;
+        } else {
+            points -= duration;
+        }
+        points = Math.max(points, 0);
+    }
+
+
+
 
     private void check(){
         points = 0;

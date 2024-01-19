@@ -4,24 +4,23 @@ import java.awt.*;
 
 public class Element {
 
-    int x;
-    int y;
+    float x; // Changed to float
+    float y; // Changed to float
     int width;
     int height;
     Image image;
 
-    public int getX() {
+    public float getX() { // Return type changed to float
         return x;
     }
 
-    public int getY() {
+    public float getY() { // Return type changed to float
         return y;
     }
 
     public int getWidth() {
         return width;
     }
-
 
     public int getHeight() {
         return height;
@@ -31,7 +30,7 @@ public class Element {
         return image;
     }
 
-    void getDimensions(){
+    void getDimensions() {
         width = image.getWidth(null);
         height = image.getHeight(null);
     }
